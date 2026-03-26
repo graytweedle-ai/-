@@ -71,7 +71,7 @@
         .corner-br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 15px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-900 overflow-x-hidden text-center text-center">
+<body class="bg-slate-50 min-h-screen text-slate-900 overflow-x-hidden text-center">
 
     <!-- 頂部導航 -->
     <nav class="bg-slate-900 text-white p-5 shadow-2xl sticky top-0 z-50 border-b border-white/5">
@@ -87,7 +87,7 @@
 
     <!-- 頁面一：設定模式 -->
     <div id="page-setup" class="page-transition p-4 max-w-md mx-auto space-y-6">
-        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 text-center text-center text-center">
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 text-center">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">1. 備料清單輸入</h2>
                 <span id="list-stat" class="text-[10px] text-slate-400 font-mono text-center">0 Items</span>
@@ -95,7 +95,7 @@
             <textarea id="part-list" 
                       class="w-full h-48 p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-blue-500/10 focus:outline-none text-sm font-mono transition-all mb-6 shadow-inner"
                       placeholder="請在此輸入料號，每行一個..."></textarea>
-            <button onclick="goToWorkPage()" class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black active:scale-[0.97] transition-all shadow-xl shadow-slate-200 text-sm uppercase tracking-[0.2em] text-center text-center">
+            <button onclick="goToWorkPage()" class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black active:scale-[0.97] transition-all shadow-xl shadow-slate-200 text-sm uppercase tracking-[0.2em] text-center">
                 進入工作頁
             </button>
         </section>
@@ -105,62 +105,62 @@
     <div id="page-work" class="hidden page-transition p-4 max-w-md mx-auto space-y-5 pb-10">
         
         <header class="flex items-center justify-between bg-white rounded-[2rem] p-4 shadow-sm border border-slate-200">
-            <div class="flex flex-col ml-2 text-left text-left">
+            <div class="flex flex-col ml-2 text-left">
                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-left w-full">上次比對結果</p>
                 <div id="last-match-display" class="text-lg font-black text-blue-600 italic tracking-tighter underline decoration-blue-100 decoration-2 underline-offset-4">
                     ---
                 </div>
             </div>
-            <button onclick="toggleInventoryDetail()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl font-black text-[10px] shadow-lg active:scale-90 transition-all uppercase tracking-widest text-center text-center text-center">
+            <button onclick="toggleInventoryDetail()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl font-black text-[10px] shadow-lg active:scale-90 transition-all uppercase tracking-widest text-center">
                 分析 📊
             </button>
         </header>
 
-        <div id="inventory-detail-box" class="hidden bg-white rounded-[2rem] p-6 shadow-xl border border-blue-100 animate-in slide-in-from-top-4 duration-300 mx-auto text-center text-center text-center text-center">
+        <div id="inventory-detail-box" class="hidden bg-white rounded-[2rem] p-6 shadow-xl border border-blue-100 animate-in slide-in-from-top-4 duration-300 mx-auto text-center">
             <div class="grid grid-cols-2 gap-4 mb-6 text-center">
-                <div class="bg-green-50 p-4 rounded-2xl border border-green-100 text-center text-center">
+                <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
                     <p class="text-[9px] text-green-600 font-black mb-1 uppercase tracking-widest text-center w-full">已完成</p>
                     <p id="matched-count" class="text-2xl font-black text-green-700 text-center w-full">0</p>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-400 text-center text-center">
-                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full text-center text-slate-400 text-center">待處理</p>
-                    <p id="unmatched-count" class="text-2xl font-black text-center w-full text-slate-400 text-center">0</p>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-400 text-center">
+                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full">待處理</p>
+                    <p id="unmatched-count" class="text-2xl font-black text-center w-full text-slate-400">0</p>
                 </div>
             </div>
-            <div class="space-y-6 max-h-[300px] overflow-y-auto pr-1 text-left text-left text-left">
+            <div class="space-y-6 max-h-[300px] overflow-y-auto pr-1 text-left">
                 <div class="space-y-2">
                     <h4 class="text-[10px] font-black text-green-600 uppercase tracking-widest border-b border-green-100 pb-2 px-1 italic">✓ Checked List</h4>
                     <div id="matched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs"></div>
                 </div>
                 <div class="space-y-2">
                     <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100 pb-2 px-1 italic text-left">○ Pending List</h4>
-                    <div id="unmatched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs text-left text-left"></div>
+                    <div id="unmatched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs text-left"></div>
                 </div>
             </div>
         </div>
 
         <!-- 掃描核心區域 -->
         <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 relative">
-            <div class="flex justify-between items-center mb-4 px-2 text-center text-center">
-                <div class="flex flex-col text-left flex-1 mr-2 text-left text-left">
+            <div class="flex justify-between items-center mb-4 px-2 text-center">
+                <div class="flex flex-col text-left flex-1 mr-2">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Live Match</h2>
                     <label class="flex items-center mt-2 cursor-pointer select-none">
                         <input type="checkbox" id="boost-toggle" class="sr-only peer" onchange="toggleBoost()">
                         <div class="w-6 h-3 bg-slate-200 rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:bg-white after:rounded-full after:h-2 after:w-2 after:top-[30px] after:left-[9px] peer-checked:after:translate-x-3 transition-all"></div>
-                        <span class="ml-2 text-[8px] font-black text-slate-400 uppercase tracking-widest text-left text-left">影像強化 (B&W)</span>
+                        <span class="ml-2 text-[8px] font-black text-slate-400 uppercase tracking-widest text-left">影像強化 (B&W)</span>
                     </label>
                 </div>
-                <div class="flex space-x-1 text-center text-center text-center">
+                <div class="flex space-x-1">
                     <button id="torch-btn" onclick="toggleTorch()" class="hidden bg-amber-50 text-amber-600 w-10 h-10 flex items-center justify-center rounded-xl border border-amber-100 active:bg-amber-100 shadow-sm text-sm">🔦</button>
-                    <button id="cam-toggle-btn" onclick="toggleScanner()" class="bg-blue-600 text-white px-6 h-10 rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 active:bg-blue-700 uppercase tracking-widest transition-all text-center text-center text-center">啟動掃描</button>
+                    <button id="cam-toggle-btn" onclick="toggleScanner()" class="bg-blue-600 text-white px-6 h-10 rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 active:bg-blue-700 uppercase tracking-widest transition-all text-center">啟動掃描</button>
                 </div>
             </div>
             
             <div id="scanner-container" 
                  onclick="handleScannerClick()"
-                 class="relative overflow-hidden rounded-3xl shadow-inner bg-slate-900 ring-4 ring-slate-100 transition-all duration-500 aspect-square cursor-pointer group mx-auto text-center text-center">
+                 class="relative overflow-hidden rounded-3xl shadow-inner bg-slate-900 ring-4 ring-slate-100 transition-all duration-500 aspect-square cursor-pointer group mx-auto text-center">
                 
-                <div id="reader" class="w-full h-full text-center text-center"></div>
+                <div id="reader" class="w-full h-full text-center"></div>
                 
                 <!-- 捕捉定格層 -->
                 <div id="screenshot-view" class="absolute inset-0 hidden z-10 transition-opacity duration-300">
@@ -169,10 +169,10 @@
                 
                 <!-- 結果覆蓋層 -->
                 <div id="camera-overlay" class="scanner-overlay opacity-0 transition-all duration-200">
-                    <div id="overlay-card" class="px-8 py-5 rounded-3xl shadow-2xl transform scale-50 transition-all duration-300 flex flex-col items-center backdrop-blur-md border border-white/20 text-center text-center">
-                        <span id="overlay-icon" class="text-5xl mb-2 text-center text-center text-center"></span>
-                        <span id="overlay-msg" class="text-xl font-black tracking-tight text-white text-center text-center text-center"></span>
-                        <span id="overlay-sub" class="text-[10px] font-bold uppercase mt-2 opacity-90 tracking-[0.2em] text-white break-all text-center text-center text-center"></span>
+                    <div id="overlay-card" class="px-8 py-5 rounded-3xl shadow-2xl transform scale-50 transition-all duration-300 flex flex-col items-center backdrop-blur-md border border-white/20 text-center">
+                        <span id="overlay-icon" class="text-5xl mb-2 text-center"></span>
+                        <span id="overlay-msg" class="text-xl font-black tracking-tight text-white text-center"></span>
+                        <span id="overlay-sub" class="text-[10px] font-bold uppercase mt-2 opacity-90 tracking-[0.2em] text-white break-all text-center"></span>
                     </div>
                 </div>
 
@@ -183,36 +183,36 @@
                         <div class="corner-part corner-tr"></div>
                         <div class="corner-part corner-bl"></div>
                         <div class="corner-part corner-br"></div>
-                        <div id="scan-line" class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500/90 shadow-[0_0_12px_rgba(239,68,68,0.9)] hidden text-center text-center"></div>
+                        <div id="scan-line" class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500/90 shadow-[0_0_12px_rgba(239,68,68,0.9)] hidden text-center"></div>
                     </div>
                 </div>
                 
                 <!-- 待機遮罩 -->
-                <div id="standby-mask" class="absolute inset-0 bg-slate-900/40 flex flex-col items-center justify-center text-white z-40 transition-opacity duration-500 text-center text-center">
-                    <div class="w-16 h-16 rounded-full border-4 border-white/40 flex items-center justify-center mb-3 bg-slate-900/20 group-active:scale-95 transition-transform text-center text-center">
-                        <span class="text-2xl text-white text-center text-center">📸</span>
+                <div id="standby-mask" class="absolute inset-0 bg-slate-900/40 flex flex-col items-center justify-center text-white z-40 transition-opacity duration-500 text-center">
+                    <div class="w-16 h-16 rounded-full border-4 border-white/40 flex items-center justify-center mb-3 bg-slate-900/20 group-active:scale-95 transition-transform text-center">
+                        <span class="text-2xl text-white">📸</span>
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 text-center text-white text-center text-white text-center">點擊畫面開始比對</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80 text-center text-white">點擊畫面開始比對</p>
                 </div>
             </div>
         </section>
 
         <!-- 最近紀錄與匯出 -->
-        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 text-center text-center">
-            <div class="flex justify-between items-center mb-4 px-2 text-center text-center text-center text-center">
+        <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 text-center">
+            <div class="flex justify-between items-center mb-4 px-2 text-center">
                 <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">最近比對 (不重複)</h2>
-                <button onclick="exportToCSV()" class="text-[9px] font-black text-blue-500 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 tracking-widest uppercase hover:bg-blue-600 hover:text-white transition-all text-center text-center">
+                <button onclick="exportToCSV()" class="text-[9px] font-black text-blue-500 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 tracking-widest uppercase hover:bg-blue-600 hover:text-white transition-all text-center">
                     輸出報告 📂
                 </button>
             </div>
-            <div id="unique-history-list" class="space-y-2 mb-6 min-h-[120px] text-center w-full text-center text-center">
-                <p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium text-center w-full text-center text-center text-center">等待比對數據...</p>
+            <div id="unique-history-list" class="space-y-2 mb-6 min-h-[120px] text-center w-full">
+                <p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium text-center w-full">等待比對數據...</p>
             </div>
-            <div class="flex space-x-2 text-center text-center text-center">
-                <button onclick="toggleLogDetail()" class="flex-1 py-4 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border border-slate-200 active:scale-95 transition-all text-center text-center text-center">
+            <div class="flex space-x-2 text-center">
+                <button onclick="toggleLogDetail()" class="flex-1 py-4 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border border-slate-200 active:scale-95 transition-all text-center">
                     日誌 ↓
                 </button>
-                <button onclick="finishWork()" class="flex-1 py-4 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border border-red-100 active:scale-95 transition-all text-center font-bold text-center text-center">
+                <button onclick="finishWork()" class="flex-1 py-4 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border border-red-100 active:scale-95 transition-all text-center font-bold text-center">
                     結束作業 🏁
                 </button>
             </div>
@@ -220,14 +220,14 @@
     </div>
 
     <!-- 彈窗組件 -->
-    <div id="reset-confirm-modal" class="hidden fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-6 text-center text-center text-center text-center text-center">
-        <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-200 text-center text-center text-center text-center">
-            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-center text-center text-center text-center">⚠️</div>
-            <h4 class="font-black text-slate-800 mb-2 uppercase tracking-tight text-center w-full text-center text-center text-center text-center text-center">重置任務？</h4>
-            <p class="text-xs text-slate-400 mb-8 leading-relaxed text-center w-full text-center text-center text-center text-center text-center">這將會結束目前進度並清空所有比對紀錄。</p>
-            <div class="space-y-3 w-full text-center text-center text-center">
-                <button onclick="confirmReset(true)" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all text-center text-center">確認重置</button>
-                <button onclick="confirmReset(false)" class="w-full py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all text-center text-center text-center text-center text-center">取消</button>
+    <div id="reset-confirm-modal" class="hidden fixed inset-0 z-[200] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-6 text-center">
+        <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-200 text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-center">⚠️</div>
+            <h4 class="font-black text-slate-800 mb-2 uppercase tracking-tight text-center w-full">重置任務？</h4>
+            <p class="text-xs text-slate-400 mb-8 leading-relaxed text-center w-full">這將會結束目前進度並清空所有比對紀錄。</p>
+            <div class="space-y-3 w-full text-center">
+                <button onclick="confirmReset(true)" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all text-center">確認重置</button>
+                <button onclick="confirmReset(false)" class="w-full py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all text-center">取消</button>
             </div>
         </div>
     </div>
@@ -253,7 +253,7 @@
                 gainNode.connect(audioCtx.destination);
                 oscillator.start();
                 oscillator.stop(audioCtx.currentTime + 0.15);
-            } catch (e) { console.warn("Audio blocked", e); }
+            } catch (e) { console.warn("Audio feedback error", e); }
         }
 
         function triggerVibrate() {
@@ -315,8 +315,8 @@
                 isScannerRunning = false;
                 if (html5QrCode) {
                     html5QrCode.stop().catch(() => {}).finally(() => {
-                        const readerEl = document.getElementById('reader');
-                        if (readerEl) readerEl.innerHTML = "";
+                        const el = document.getElementById('reader');
+                        if (el) el.innerHTML = "";
                         html5QrCode = null;
                     });
                 }
@@ -341,7 +341,7 @@
         async function startScanner() {
             if (isScannerRunning) return;
             
-            // 預防性清理：徹底重置視訊容器
+            // 預防性清理：確保 DOM 完全乾淨
             const readerEl = document.getElementById('reader');
             if (readerEl) readerEl.innerHTML = "";
             
@@ -357,7 +357,7 @@
                 fps: 25, 
                 qrbox: (w, h) => {
                     const side = Math.min(w, h);
-                    // 維持 80% 高度採樣區，模擬打斜掃描的高像素密度
+                    // 核心調校：維持 80% 高度採樣區，改善對於正常大小條碼的抓地力
                     return { width: side * 0.9, height: side * 0.8 }; 
                 },
                 aspectRatio: 1.0,
@@ -377,31 +377,26 @@
                     await html5QrCode.start(constraints, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
                     return true;
                 } catch (e) { 
-                    console.warn("Ignition stage failed:", e.name);
+                    console.warn("Start attempt failed:", e.name, e.message);
                     return false; 
                 }
             };
 
-            // 分階點火協議 (Layered Ignition) - 針對電腦端進行極簡化處理
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            // 層級點火協議 (Layered Ignition)
+            // 嘗試路徑：後置環境鏡頭 -> 任何可用的環境鏡頭 -> 終極降壓啟動 (無參數)
             let success = false;
+            
+            // 嘗試 1：移動端標準後置鏡頭
+            success = await tryStart({ facingMode: "environment" });
 
-            if (isMobile) {
-                // 移動端：嘗試環境後置鏡頭啟動
-                success = await tryStart({ facingMode: "environment" });
-                
-                // 如果後置鏡頭啟動失敗，則嘗試一般環境參數
-                if (!success) {
-                    success = await tryStart({ facingMode: "environment" });
-                }
-            } else {
-                // 電腦端：徹底解除所有參數，使用瀏覽器預設的純粹啟動
-                success = await tryStart({});
+            // 嘗試 2：若失敗，嘗試帶變焦的進階參數 (僅在部分支援設備上生效)
+            if (!success) {
+                success = await tryStart({ facingMode: { ideal: "environment" } });
             }
 
-            // 終極防護：如果以上都失敗，強制解除所有限制啟動
+            // 嘗試 3：電腦端/全通用模式，徹底解除硬體約束
             if (!success) {
-                success = await tryStart({});
+                success = await tryStart({}); // 讓瀏覽器根據當前環境自選最穩定的鏡頭
             }
 
             if (success) {
@@ -415,7 +410,7 @@
             } else {
                 isScannerRunning = false;
                 updateScannerUI();
-                showToast("啟動失敗：鏡頭已被佔用或未授權");
+                showToast("快門失敗：請確認鏡頭權限");
                 document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');
             }
         }
@@ -445,10 +440,10 @@
             if (!btn) return;
             if (isScannerRunning) {
                 btn.innerText = "CANCEL";
-                btn.className = "bg-slate-200 text-slate-500 px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center text-center";
+                btn.className = "bg-slate-200 text-slate-500 px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center";
             } else {
                 btn.innerText = "啟動掃描";
-                btn.className = "bg-blue-600 text-white px-6 h-10 rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 active:bg-blue-700 uppercase tracking-widest transition-all text-center text-center text-center";
+                btn.className = "bg-blue-600 text-white px-6 h-10 rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 active:bg-blue-700 uppercase tracking-widest transition-all text-center";
             }
         }
 
@@ -463,16 +458,16 @@
             if (isProcessing) return;
             isProcessing = true;
             
-            // 1. 數據即時簽到 (存檔 > 動作)
+            // 1. 數據簽到 (存檔優先)
             const isMatch = inventory.has(code);
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             
-            // 更新數據庫
+            // 更新本地快照
             historyArray = historyArray.filter(h => h.code !== code);
             historyArray.unshift({ code, isMatch, timeStr });
             
-            // 2. 觸發感官回饋與即時 DOM 渲染
+            // 2. 觸發回饋
             triggerVibrate();
             playBeep();
             captureFrame(); 
@@ -483,7 +478,7 @@
             const remaining = renderInventoryStatus();
             showOverlay(code, isMatch, false);
 
-            // 3. 延時熄火：給予足夠的寫入時間，解決 iOS 的紀錄遺失
+            // 3. 延遲熄火：確保渲染完成，解決 iOS 遺失紀錄的問題
             setTimeout(async () => {
                 await stopScanner();
                 isProcessing = false; 
@@ -519,12 +514,12 @@
             const msg = document.getElementById('overlay-msg');
             const sub = document.getElementById('overlay-sub');
             if (isMatch) {
-                card.className = "px-8 py-5 rounded-3xl shadow-2xl transform transition-all duration-300 flex flex-col items-center bg-green-500/90 text-white match-glow border border-white/20 text-center text-center";
+                card.className = "px-8 py-5 rounded-3xl shadow-2xl transform transition-all duration-300 flex flex-col items-center bg-green-500/90 text-white match-glow border border-white/20 text-center";
                 icon.innerText = "🎯";
                 msg.innerText = "正確";
                 sub.innerText = `${code}`;
             } else {
-                card.className = "px-8 py-5 rounded-3xl shadow-2xl transform transition-all duration-300 flex flex-col items-center bg-red-600/95 text-white border border-white/20 text-center text-center";
+                card.className = "px-8 py-5 rounded-3xl shadow-2xl transform transition-all duration-300 flex flex-col items-center bg-red-600/95 text-white border border-white/20 text-center";
                 icon.innerText = "💨";
                 msg.innerText = "不在清單內";
                 sub.innerText = `料號: ${code}`;
@@ -543,20 +538,20 @@
             if (!uniqueList) return;
             
             if (historyArray.length === 0) {
-                uniqueList.innerHTML = `<p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium text-center w-full text-center text-center">等待比對數據...</p>`;
+                uniqueList.innerHTML = `<p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium text-center w-full">等待比對數據...</p>`;
                 return;
             }
             
             const recentThree = historyArray.slice(0, 3);
             uniqueList.innerHTML = recentThree.map((item, index) => `
                 <div class="flex justify-between items-center p-4 rounded-2xl border transition-all ${index === 0 ? 'bg-white border-blue-200 shadow-md scale-[1.02] z-10' : 'bg-slate-50 border-transparent opacity-60'}">
-                    <div class="flex flex-col text-left text-left text-left">
-                        <span class="font-mono text-sm font-black text-slate-800 tracking-tighter text-left text-xs text-left">${item.code}</span>
-                        <span class="text-[8px] font-black ${item.isMatch ? 'text-green-500' : 'text-red-400'} tracking-[0.1em] uppercase italic text-left text-left text-left">
+                    <div class="flex flex-col text-left">
+                        <span class="font-mono text-sm font-black text-slate-800 tracking-tighter text-left text-xs">${item.code}</span>
+                        <span class="text-[8px] font-black ${item.isMatch ? 'text-green-500' : 'text-red-400'} tracking-[0.1em] uppercase italic text-left">
                             ${item.isMatch ? 'Correct' : 'Mismatch'}
                         </span>
                     </div>
-                    <span class="text-[9px] text-slate-300 font-mono tracking-tighter text-right text-right text-right text-right text-right text-right text-right">${item.timeStr}</span>
+                    <span class="text-[9px] text-slate-300 font-mono tracking-tighter text-right">${item.timeStr}</span>
                 </div>
             `).join('');
         }
@@ -582,19 +577,19 @@
             if (!mList || !uList) return unmatchedParts.length;
             
             mList.innerHTML = matchedParts.length > 0 
-                ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs text-left text-left text-left text-left text-left text-left text-left">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right text-right text-right text-right text-right text-right text-right">OK</span></div>`).join('')
-                : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full text-center text-center text-center">尚未命中目標</div>';
+                ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right">OK</span></div>`).join('')
+                : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
             
             uList.innerHTML = unmatchedParts.length > 0
-                ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left"><span class="text-slate-500 text-xs text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right text-right text-right text-right text-right text-right text-right text-right text-right">WAIT</span></div>`).join('')
-                : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full text-center text-center text-center text-center text-center text-center text-center text-center"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center text-center text-center text-center text-center text-center text-center">MISSION COMPLETE</p></div>';
+                ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('')
+                : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center">MISSION COMPLETE</p></div>';
             
             return unmatchedParts.length;
         }
 
         function showToast(m) {
             const t = document.createElement('div');
-            t.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl text-[10px] font-black z-[200] shadow-2xl animate-bounce border border-white/10 uppercase tracking-[0.2em] whitespace-nowrap text-center backdrop-blur-sm text-center text-center text-center text-center text-center text-center";
+            t.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl text-[10px] font-black z-[200] shadow-2xl animate-bounce border border-white/10 uppercase tracking-[0.2em] whitespace-nowrap text-center backdrop-blur-sm";
             t.innerText = m; document.body.appendChild(t);
             setTimeout(() => t.remove(), 2500);
         }

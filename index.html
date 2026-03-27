@@ -128,7 +128,7 @@
 
                 <!-- 狙擊準星視覺層 -->
                 <div id="guide-lines" class="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
-                    <div id="scan-frame" class="w-[85%] h-[25%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+                    <div id="scan-frame" class="w-[90%] h-[20%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
                         <div class="corner-part corner-tl"></div><div class="corner-part corner-tr"></div><div class="corner-part corner-bl"></div><div class="corner-part corner-br"></div>
                         <div id="scan-line" class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500/90 shadow-[0_0_12px_rgba(239,68,68,0.9)] hidden"></div>
                     </div>
@@ -249,7 +249,7 @@
 
         function handleScannerClick() { if (!isScannerRunning && !isProcessing) startScanner(); }
 
-        // --- 針對一維條碼進行核心重組方案 ---
+        // --- 優化：針對非微距 iPhone 強化「遠距離狙擊」能力 ---
         async function startScanner() {
             if (isScannerRunning) return;
             const readerEl = document.getElementById('reader');
@@ -263,14 +263,18 @@
             html5QrCode = new Html5Qrcode("reader");
             
             const config = { 
-                fps: 10, 
-                // 將窗口改為長方形寬闊視野，更適合 1D 條碼
-                qrbox: { width: 320, height: 160 },
-                // 關鍵：啟動硬體加速，這在 iOS 掃條碼時效果顯著
-                experimentalFeatures: {
-                    useBarCodeDetectorIfSupported: true
+                fps: 15, // 稍微提升偵數，增加在對焦邊緣捕捉到清晰影格的機率
+                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                    // 極致狹縫採樣：90% 寬度確保安靜區入鏡，20% 高度集中運算資源
+                    return { 
+                        width: viewfinderWidth * 0.9, 
+                        height: viewfinderHeight * 0.2 
+                    };
                 },
-                // 限定辨識格式，減少演算法在非條碼格式上的運算負擔
+                aspectRatio: 1.0,
+                experimentalFeatures: {
+                    useBarCodeDetectorIfSupported: true // 持續利用 iOS 處理器硬體加速
+                },
                 formatsToSupport: [
                     Html5QrcodeSupportedFormats.CODE_128,
                     Html5QrcodeSupportedFormats.CODE_39,

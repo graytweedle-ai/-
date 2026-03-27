@@ -81,7 +81,7 @@
                     <p id="matched-count" class="text-2xl font-black text-green-700 text-center w-full">0</p>
                 </div>
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-400 text-center">
-                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full">待處理</p>
+                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full text-slate-400">待處理</p>
                     <p id="unmatched-count" class="text-2xl font-black text-center w-full text-slate-400">0</p>
                 </div>
             </div>
@@ -97,7 +97,7 @@
             </div>
         </div>
 
-        <!-- 掃描核心 -->
+        <!-- 掃描核心區域 -->
         <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 relative text-center">
             <div class="flex justify-between items-center mb-4 px-2">
                 <div class="flex flex-col text-left flex-1 mr-2">
@@ -126,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- 狙擊準星 (視覺層) -->
+                <!-- 狙擊準星視覺層 -->
                 <div id="guide-lines" class="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
                     <div id="scan-frame" class="w-[85%] h-[35%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
                         <div class="corner-part corner-tl"></div><div class="corner-part corner-tr"></div><div class="corner-part corner-bl"></div><div class="corner-part corner-br"></div>
@@ -143,7 +143,7 @@
             </div>
         </section>
 
-        <!-- 歷史清單 -->
+        <!-- 歷史清單：具備連續去重與展開功能 -->
         <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 text-center">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">歷史清單</h2>
@@ -164,9 +164,9 @@
     <div id="mission-complete-modal" class="hidden fixed inset-0 z-[200] bg-green-900/80 backdrop-blur-md flex items-center justify-center p-6 text-center">
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner shadow-green-200/30 text-center">🏆</div>
-            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter w-full">任務完滿達成</h4>
-            <p class="text-xs text-slate-400 mb-10 leading-relaxed px-4 w-full">清單內所有料號已全數核對完畢。</p>
-            <button onclick="closeCompleteModal()" class="w-full py-4 bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">確定</button>
+            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter w-full text-center">任務完滿達成</h4>
+            <p class="text-xs text-slate-400 mb-10 leading-relaxed px-4 w-full text-center">清單內所有料號已全數核對完畢。</p>
+            <button onclick="closeCompleteModal()" class="w-full py-4 bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all">確定</button>
         </div>
     </div>
 
@@ -249,7 +249,7 @@
 
         function handleScannerClick() { if (!isScannerRunning && !isProcessing) startScanner(); }
 
-        // --- 核心改動：直接植入示範代碼方案 ---
+        // --- 暴力植入方案之微調版：優化 1D 條碼窗口 ---
         async function startScanner() {
             if (isScannerRunning) return;
             const readerEl = document.getElementById('reader');
@@ -262,14 +262,13 @@
 
             html5QrCode = new Html5Qrcode("reader");
             
-            // 嚴格植入示範參數：不添加任何額外的格式或比例約束
+            // 將正方形窗口改為長方形：允許條碼在較遠距離也能橫向入鏡
             const config = { 
                 fps: 10, 
-                qrbox: 250
+                qrbox: { width: 320, height: 150 } 
             };
             
             try {
-                // 植入示範啟動指令：僅使用 facingMode，讓瀏覽器自行決定最穩定路徑
                 await html5QrCode.start(
                     { facingMode: "environment" }, 
                     config, 
@@ -327,7 +326,6 @@
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             
-            // 保持現有的「連續去重」邏輯
             if (historyArray.length > 0 && historyArray[0].code === code) {
                 historyArray[0].timeStr = timeStr;
                 historyArray[0].isMatch = isMatch;
@@ -421,8 +419,8 @@
             const unmatchedParts = [...inventory].filter(code => !historyArray.some(h => h.code === code && h.isMatch));
             document.getElementById('matched-count').innerText = matchedParts.length;
             document.getElementById('unmatched-count').innerText = unmatchedParts.length;
-            document.getElementById('matched-parts-list').innerHTML = matchedParts.length > 0 ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right">OK</span></div>`).join('') : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
-            document.getElementById('unmatched-parts-list').innerHTML = unmatchedParts.length > 0 ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('') : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center">MISSION COMPLETE</p></div>';
+            document.getElementById('matched-parts-list').innerHTML = matchedParts.length > 0 ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right">OK</span></div>`).join('') : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
+            document.getElementById('unmatched-parts-list').innerHTML = unmatchedParts.length > 0 ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('') : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center">MISSION COMPLETE</p></div>';
             return unmatchedParts.length;
         }
 

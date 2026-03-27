@@ -81,7 +81,7 @@
                     <p id="matched-count" class="text-2xl font-black text-green-700 text-center w-full">0</p>
                 </div>
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-400 text-center">
-                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full text-slate-400">待處理</p>
+                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full">待處理</p>
                     <p id="unmatched-count" class="text-2xl font-black text-center w-full text-slate-400">0</p>
                 </div>
             </div>
@@ -91,7 +91,7 @@
                     <div id="matched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs"></div>
                 </div>
                 <div class="space-y-2">
-                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100 pb-2 px-1 italic">○ Pending List</h4>
+                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100 pb-2 px-1 italic text-left">○ Pending List</h4>
                     <div id="unmatched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs"></div>
                 </div>
             </div>
@@ -126,9 +126,9 @@
                     </div>
                 </div>
 
-                <!-- 狙擊準星：視覺與邏輯同步 -->
+                <!-- 狙擊準星：物理掃描區域縮窄優化 -->
                 <div id="guide-lines" class="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
-                    <div id="scan-frame" class="w-[85%] h-[35%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+                    <div id="scan-frame" class="w-[85%] h-[30%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
                         <div class="corner-part corner-tl"></div><div class="corner-part corner-tr"></div><div class="corner-part corner-bl"></div><div class="corner-part corner-br"></div>
                         <div id="scan-line" class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500/90 shadow-[0_0_12px_rgba(239,68,68,0.9)] hidden"></div>
                     </div>
@@ -252,7 +252,6 @@
         async function startScanner() {
             if (isScannerRunning) return;
             
-            // 預防性清理：確保舊的資源完全釋放
             const readerEl = document.getElementById('reader');
             if (readerEl) readerEl.innerHTML = "";
             
@@ -265,11 +264,11 @@
             html5QrCode = new Html5Qrcode("reader");
             
             const config = { 
-                fps: 25, 
+                fps: 15, // 降低 FPS 減輕 iOS 運算負擔，增加單幀對比度品質
                 qrbox: (w, h) => { 
                     const side = Math.min(w, h); 
-                    // 將實際辨識視窗縮窄，強迫在 iOS 上提高單位像素的採樣品質
-                    return { width: side * 0.85, height: side * 0.35 }; 
+                    // 鎖定 30% 高度窗口，寬度增加至 95% 確保條碼 Quiet Zone（留白區）入鏡
+                    return { width: side * 0.95, height: side * 0.3 }; 
                 },
                 aspectRatio: 1.0,
                 experimentalFeatures: { useBarCodeDetectorIfSupported: true },
@@ -277,7 +276,7 @@
             };
             
             try {
-                // 回歸柔性點火：不強求解析度，優先保證啟動成功
+                // 回歸最穩定啟動模式
                 await html5QrCode.start({ facingMode: "environment" }, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
                 setTimeout(() => {
                     try {
@@ -286,7 +285,7 @@
                     } catch(e) {}
                 }, 300);
             } catch (err) { 
-                isScannerRunning = false; updateScannerUI(); showToast("鏡頭啟動失敗");
+                isScannerRunning = false; updateScannerUI(); showToast("鏡頭點火失敗");
                 document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');
             }
         }
@@ -322,7 +321,6 @@
             try { await html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] }); } catch(e) {}
         }
 
-        // --- 核心邏輯：連續去重 A->A->A->B->A => A, B, A ---
         function handleScan(code) {
             if (isProcessing) return;
             isProcessing = true;
@@ -331,7 +329,7 @@
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             
-            // 數據寫入邏輯
+            // 連續去重：A->A->A->B->A => A, B, A
             if (historyArray.length > 0 && historyArray[0].code === code) {
                 historyArray[0].timeStr = timeStr;
                 historyArray[0].isMatch = isMatch;

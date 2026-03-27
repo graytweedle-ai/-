@@ -81,7 +81,7 @@
                     <p id="matched-count" class="text-2xl font-black text-green-700 text-center w-full">0</p>
                 </div>
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-400 text-center">
-                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full">待處理</p>
+                    <p class="text-[9px] font-black mb-1 uppercase tracking-widest text-center w-full text-slate-400">待處理</p>
                     <p id="unmatched-count" class="text-2xl font-black text-center w-full text-slate-400">0</p>
                 </div>
             </div>
@@ -91,7 +91,7 @@
                     <div id="matched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs"></div>
                 </div>
                 <div class="space-y-2">
-                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100 pb-2 px-1 italic text-left">○ Pending List</h4>
+                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-100 pb-2 px-1 italic">○ Pending List</h4>
                     <div id="unmatched-parts-list" class="flex flex-col space-y-1.5 font-mono text-xs"></div>
                 </div>
             </div>
@@ -164,7 +164,7 @@
     <div id="mission-complete-modal" class="hidden fixed inset-0 z-[200] bg-green-900/80 backdrop-blur-md flex items-center justify-center p-6 text-center">
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner shadow-green-200/30 text-center">🏆</div>
-            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter w-full">任務完滿達成</h4>
+            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter text-center w-full">任務完滿達成</h4>
             <p class="text-xs text-slate-400 mb-10 leading-relaxed px-4 w-full">清單內所有料號已全數核對完畢。</p>
             <button onclick="closeCompleteModal()" class="w-full py-4 bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">確定</button>
         </div>
@@ -175,7 +175,7 @@
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-200">
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">⚠️</div>
             <h4 class="font-black text-slate-800 mb-2 uppercase tracking-tight w-full text-center">確定要重置？</h4>
-            <p class="text-xs text-slate-400 mb-8 leading-relaxed w-full text-center">目前的掃描進度與歷史清單將會歸零。</p>
+            <p class="text-xs text-slate-400 mb-8 leading-relaxed w-full">目前的掃描進度與歷史清單將會歸零。</p>
             <div class="space-y-3 w-full">
                 <button onclick="confirmReset(true)" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">確認重置</button>
                 <button onclick="confirmReset(false)" class="w-full py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest">取消</button>
@@ -251,20 +251,24 @@
 
         async function startScanner() {
             if (isScannerRunning) return;
+            
+            // 預防性清理：確保舊的資源完全釋放
             const readerEl = document.getElementById('reader');
             if (readerEl) readerEl.innerHTML = "";
+            
             isScannerRunning = true;
             document.getElementById('standby-mask').classList.add('opacity-0', 'pointer-events-none');
             document.getElementById('screenshot-view').classList.add('hidden'); 
             document.getElementById('scan-line').classList.remove('hidden');
             updateScannerUI();
+
             html5QrCode = new Html5Qrcode("reader");
             
-            // --- 實驗重點：維持視覺紅線比例，準備注入高畫質約束 ---
             const config = { 
                 fps: 25, 
                 qrbox: (w, h) => { 
                     const side = Math.min(w, h); 
+                    // 將實際辨識視窗縮窄，強迫在 iOS 上提高單位像素的採樣品質
                     return { width: side * 0.85, height: side * 0.35 }; 
                 },
                 aspectRatio: 1.0,
@@ -273,13 +277,8 @@
             };
             
             try {
-                // 向 iOS 顯式請求 1280x720 解析度，解決「清晰但讀不到」的數據損耗問題
-                await html5QrCode.start(
-                    { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                    config, 
-                    (text) => { if (!isProcessing) handleScan(text); }, 
-                    () => {}
-                );
+                // 回歸柔性點火：不強求解析度，優先保證啟動成功
+                await html5QrCode.start({ facingMode: "environment" }, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
                 setTimeout(() => {
                     try {
                         const caps = html5QrCode.getRunningTrackCapabilities();
@@ -287,13 +286,8 @@
                     } catch(e) {}
                 }, 300);
             } catch (err) { 
-                // 降階點火：若高解析度請求被拒絕，則回歸最純粹的環境模式啟動
-                try {
-                    await html5QrCode.start({ facingMode: "environment" }, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
-                } catch(e) {
-                    isScannerRunning = false; updateScannerUI(); showToast("鏡頭點火失敗");
-                    document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');
-                }
+                isScannerRunning = false; updateScannerUI(); showToast("鏡頭啟動失敗");
+                document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');
             }
         }
 
@@ -337,7 +331,7 @@
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             
-            // 數據寫入邏輯：如果與上一筆連續相同，則合併時間，不新增項目
+            // 數據寫入邏輯
             if (historyArray.length > 0 && historyArray[0].code === code) {
                 historyArray[0].timeStr = timeStr;
                 historyArray[0].isMatch = isMatch;
@@ -357,7 +351,6 @@
                 isProcessing = false; 
                 hideOverlay();
                 
-                // 全數完成檢測 (基於唯一命中)
                 const matchedCount = [...inventory].filter(p => historyArray.some(h => h.code === p && h.isMatch)).length;
                 if (isMatch && matchedCount === inventory.size) {
                     document.getElementById('mission-complete-modal').classList.remove('hidden');
@@ -453,7 +446,7 @@
                 : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
             
             if (uList) uList.innerHTML = unmatchedParts.length > 0 
-                ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('') 
+                ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('') 
                 : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center">MISSION COMPLETE</p></div>';
             
             return unmatchedParts.length;

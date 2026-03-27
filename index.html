@@ -249,7 +249,7 @@
 
         function handleScannerClick() { if (!isScannerRunning && !isProcessing) startScanner(); }
 
-        // --- 核心優化：針對 iOS 深度解碼鏈強化的狙擊方案 ---
+        // --- 核心優化：回歸高相容性啟動模式，修復安卓與 PC 端的點火問題 ---
         async function startScanner() {
             if (isScannerRunning) return;
             const readerEl = document.getElementById('reader');
@@ -263,11 +263,11 @@
             html5QrCode = new Html5Qrcode("reader");
             
             const config = { 
-                fps: 15, // 降低影格率，賦予解碼引擎更多處理每一影格細節的時間
-                qrbox: { width: 300, height: 150 }, // 狹長窗口：提高一維條碼解析密度
+                fps: 15, 
+                qrbox: { width: 300, height: 150 }, // 保留一維條碼專用的狹長窗口
                 aspectRatio: 1.0,
                 experimentalFeatures: {
-                    useBarCodeDetectorIfSupported: true // 利用 iOS 硬體辨識加速
+                    useBarCodeDetectorIfSupported: true // 利用底層硬體加速 (若設備支援)
                 },
                 formatsToSupport: [
                     Html5QrcodeSupportedFormats.CODE_128,
@@ -279,15 +279,13 @@
             };
             
             try {
-                // 強制請求高清數據流 (使用 ideal 以獲得 iOS 更高的授權成功率)
-                const constraints = {
-                    facingMode: "environment",
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    focusMode: "continuous"
-                };
-
-                await html5QrCode.start(constraints, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
+                // 回歸最穩定啟動模式：移除所有強制的解析度約束，解決安卓與 PC 的衝突
+                await html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    config, 
+                    (text) => { if (!isProcessing) handleScan(text); }, 
+                    () => {}
+                );
                 
                 setTimeout(() => {
                     try {
@@ -296,9 +294,9 @@
                     } catch(e) {}
                 }, 300);
             } catch (err) { 
-                // 回退機制：若 HD 請求失敗，則回歸最簡環境模式啟動
+                // 若 environment 啟動失敗，則使用通用備案
                 try {
-                    await html5QrCode.start({ facingMode: "environment" }, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
+                    await html5QrCode.start({}, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
                 } catch(e) {
                     isScannerRunning = false; updateScannerUI(); showToast("鏡頭啟動失敗");
                     document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');

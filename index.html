@@ -97,7 +97,7 @@
             </div>
         </div>
 
-        <!-- 掃描核心：狙擊模式 -->
+        <!-- 掃描核心 -->
         <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-6 relative text-center">
             <div class="flex justify-between items-center mb-4 px-2">
                 <div class="flex flex-col text-left flex-1 mr-2">
@@ -126,9 +126,9 @@
                     </div>
                 </div>
 
-                <!-- 狙擊準星：物理掃描區域縮窄優化 -->
+                <!-- 狙擊準星 (視覺層) -->
                 <div id="guide-lines" class="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
-                    <div id="scan-frame" class="w-[85%] h-[30%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
+                    <div id="scan-frame" class="w-[85%] h-[35%] relative bg-white/5 rounded-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.4)]">
                         <div class="corner-part corner-tl"></div><div class="corner-part corner-tr"></div><div class="corner-part corner-bl"></div><div class="corner-part corner-br"></div>
                         <div id="scan-line" class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-red-500/90 shadow-[0_0_12px_rgba(239,68,68,0.9)] hidden"></div>
                     </div>
@@ -164,7 +164,7 @@
     <div id="mission-complete-modal" class="hidden fixed inset-0 z-[200] bg-green-900/80 backdrop-blur-md flex items-center justify-center p-6 text-center">
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner shadow-green-200/30 text-center">🏆</div>
-            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter text-center w-full">任務完滿達成</h4>
+            <h4 class="font-black text-slate-800 mb-2 text-xl tracking-tighter w-full">任務完滿達成</h4>
             <p class="text-xs text-slate-400 mb-10 leading-relaxed px-4 w-full">清單內所有料號已全數核對完畢。</p>
             <button onclick="closeCompleteModal()" class="w-full py-4 bg-green-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">確定</button>
         </div>
@@ -175,7 +175,7 @@
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-95 animate-in zoom-in duration-200">
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">⚠️</div>
             <h4 class="font-black text-slate-800 mb-2 uppercase tracking-tight w-full text-center">確定要重置？</h4>
-            <p class="text-xs text-slate-400 mb-8 leading-relaxed w-full">目前的掃描進度與歷史清單將會歸零。</p>
+            <p class="text-xs text-slate-400 mb-8 leading-relaxed w-full text-center">目前的掃描進度與歷史清單將會歸零。</p>
             <div class="space-y-3 w-full">
                 <button onclick="confirmReset(true)" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg">確認重置</button>
                 <button onclick="confirmReset(false)" class="w-full py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest">取消</button>
@@ -249,12 +249,11 @@
 
         function handleScannerClick() { if (!isScannerRunning && !isProcessing) startScanner(); }
 
+        // --- 核心改動：直接植入示範代碼方案 ---
         async function startScanner() {
             if (isScannerRunning) return;
-            
             const readerEl = document.getElementById('reader');
             if (readerEl) readerEl.innerHTML = "";
-            
             isScannerRunning = true;
             document.getElementById('standby-mask').classList.add('opacity-0', 'pointer-events-none');
             document.getElementById('screenshot-view').classList.add('hidden'); 
@@ -263,21 +262,23 @@
 
             html5QrCode = new Html5Qrcode("reader");
             
+            // 植入示範參數：fps: 10, qrbox: 250
             const config = { 
-                fps: 15, // 降低 FPS 減輕 iOS 運算負擔，增加單幀對比度品質
-                qrbox: (w, h) => { 
-                    const side = Math.min(w, h); 
-                    // 鎖定 30% 高度窗口，寬度增加至 95% 確保條碼 Quiet Zone（留白區）入鏡
-                    return { width: side * 0.95, height: side * 0.3 }; 
-                },
+                fps: 10, 
+                qrbox: 250,
                 aspectRatio: 1.0,
-                experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                 formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.QR_CODE]
             };
             
             try {
-                // 回歸最穩定啟動模式
-                await html5QrCode.start({ facingMode: "environment" }, config, (text) => { if (!isProcessing) handleScan(text); }, () => {});
+                // 植入示範啟動指令
+                await html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    config, 
+                    (text) => { if (!isProcessing) handleScan(text); }, 
+                    () => {}
+                );
+                
                 setTimeout(() => {
                     try {
                         const caps = html5QrCode.getRunningTrackCapabilities();
@@ -285,7 +286,7 @@
                     } catch(e) {}
                 }, 300);
             } catch (err) { 
-                isScannerRunning = false; updateScannerUI(); showToast("鏡頭點火失敗");
+                isScannerRunning = false; updateScannerUI(); showToast("鏡頭啟動失敗");
                 document.getElementById('standby-mask').classList.remove('opacity-0', 'pointer-events-none');
             }
         }
@@ -324,12 +325,10 @@
         function handleScan(code) {
             if (isProcessing) return;
             isProcessing = true;
-            
             const isMatch = inventory.has(code);
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
             
-            // 連續去重：A->A->A->B->A => A, B, A
             if (historyArray.length > 0 && historyArray[0].code === code) {
                 historyArray[0].timeStr = timeStr;
                 historyArray[0].isMatch = isMatch;
@@ -346,9 +345,7 @@
 
             setTimeout(async () => {
                 await stopScanner();
-                isProcessing = false; 
-                hideOverlay();
-                
+                isProcessing = false; hideOverlay();
                 const matchedCount = [...inventory].filter(p => historyArray.some(h => h.code === p && h.isMatch)).length;
                 if (isMatch && matchedCount === inventory.size) {
                     document.getElementById('mission-complete-modal').classList.remove('hidden');
@@ -389,15 +386,11 @@
 
         function renderHistory() {
             const wrapper = document.getElementById('history-items-wrapper');
-            if (historyArray.length === 0) { 
-                wrapper.innerHTML = `<p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium w-full text-center">等待巡檢數據...</p>`; 
-                return; 
-            }
-            
+            if (historyArray.length === 0) { wrapper.innerHTML = `<p class="text-slate-300 italic text-center text-xs py-10 opacity-60 font-medium w-full text-center">等待巡檢數據...</p>`; return; }
             wrapper.innerHTML = historyArray.map((item, index) => `
                 <div class="flex justify-between items-center p-4 rounded-2xl border transition-all ${index === 0 ? 'bg-white border-blue-200 shadow-md scale-[1.02] z-10' : 'bg-slate-50 border-transparent opacity-60'}">
                     <div class="flex flex-col text-left">
-                        <span class="font-mono text-sm font-black text-slate-800 tracking-tighter text-xs text-left">${item.code}</span>
+                        <span class="font-mono text-sm font-black text-slate-800 tracking-tighter text-xs text-left text-left">${item.code}</span>
                         <span class="text-[8px] font-black ${item.isMatch ? 'text-green-500' : 'text-red-400'} tracking-[0.1em] uppercase italic text-left">${item.isMatch ? 'Correct' : 'Mismatch'}</span>
                     </div>
                     <span class="text-[9px] text-slate-300 font-mono tracking-tighter text-right">${item.timeStr}</span>
@@ -410,14 +403,9 @@
             const btn = document.getElementById('history-toggle-btn');
             isHistoryExpanded = !isHistoryExpanded;
             if (isHistoryExpanded) {
-                container.style.maxHeight = '1000px';
-                container.style.overflowY = 'auto';
-                btn.innerText = '收合歷史 ↑';
+                container.style.maxHeight = '1000px'; container.style.overflowY = 'auto'; btn.innerText = '收合歷史 ↑';
             } else {
-                container.style.maxHeight = '220px';
-                container.style.overflowY = 'hidden';
-                btn.innerText = '展開全部 ↓';
-                container.scrollTop = 0;
+                container.style.maxHeight = '220px'; container.style.overflowY = 'hidden'; btn.innerText = '展開全部 ↓'; container.scrollTop = 0;
             }
         }
 
@@ -432,34 +420,7 @@
         function renderInventoryStatus() {
             const matchedParts = [...inventory].filter(code => historyArray.some(h => h.code === code && h.isMatch));
             const unmatchedParts = [...inventory].filter(code => !historyArray.some(h => h.code === code && h.isMatch));
-            
             document.getElementById('matched-count').innerText = matchedParts.length;
             document.getElementById('unmatched-count').innerText = unmatchedParts.length;
-
-            const mList = document.getElementById('matched-parts-list');
-            const uList = document.getElementById('unmatched-parts-list');
-            
-            if (mList) mList.innerHTML = matchedParts.length > 0 
-                ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right">OK</span></div>`).join('') 
-                : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
-            
-            if (uList) uList.innerHTML = unmatchedParts.length > 0 
-                ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left text-left"><span class="text-slate-500 text-xs">${p}</span><span class="text-[8px] font-black text-slate-300 italic text-right">WAIT</span></div>`).join('') 
-                : '<div class="p-8 text-center bg-green-600 rounded-3xl shadow-xl shadow-green-100 animate-pulse text-center w-full"><p class="text-xs font-black text-white tracking-widest uppercase italic w-full text-center">MISSION COMPLETE</p></div>';
-            
-            return unmatchedParts.length;
-        }
-
-        function showToast(m) {
-            const t = document.createElement('div');
-            t.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl text-[10px] font-black z-[200] shadow-2xl animate-bounce border border-white/10 uppercase tracking-[0.2em] whitespace-nowrap text-center backdrop-blur-sm";
-            t.innerText = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
-        }
-
-        window.onload = () => {
-            const saved = localStorage.getItem('part-inventory');
-            if (saved) { document.getElementById('part-list').value = saved; updateInventoryStat(); }
-        };
-    </script>
-</body>
-</html>
+            document.getElementById('matched-parts-list').innerHTML = matchedParts.length > 0 ? matchedParts.map(p => `<div class="p-3 bg-green-50 border border-green-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left"><span class="font-bold text-green-700 underline decoration-green-200 text-xs">${p}</span><span class="text-[8px] font-black text-green-400 italic text-right">OK</span></div>`).join('') : '<div class="p-3 text-center text-[10px] text-slate-300 italic w-full">尚未命中目標</div>';
+            document.getElementById('unmatched-parts-list').innerHTML = unmatchedParts.length > 0 ? unmatchedParts.map(p => `<div class="p-3 bg-slate-50 border border-slate-100 rounded-xl mb-1 flex justify-between items-center text-left text-left text-left text-left text-left text-left text-left text-left text-left"><span class="text-slate-50
